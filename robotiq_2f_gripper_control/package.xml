@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>robotiq_2f_gripper_control</name>
   <version>1.0.0</version>
   <description>Package to control a 2-Finger Gripper from Robotiq inc.</description>
@@ -8,14 +9,20 @@
   <url type="website">http://ros.org/wiki/robotiq</url>
   <author>Nicolas Lauzier (Robotiq inc.)</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <build_depend>builtin_interfaces</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <!-- <depend>robotiq_ethercat</depend> -->
 
-  <depend>rospy</depend>
-  <depend>roscpp</depend>
-  <depend>robotiq_ethercat</depend>
+  <test_depend>ament_lint_common</test_depend>
 
-  <build_depend>message_generation</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
-  <exec_depend>message_runtime</exec_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 
 </package>
