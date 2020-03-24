@@ -14,6 +14,11 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(rclpy REQUIRED)
+
+# Install the python module for this package
+ament_python_install_package(${PROJECT_NAME})
 
 set(msg_files
   "msg/Robotiq2FGripperInput.msg"
@@ -24,7 +29,21 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
 )
 
+# Install python scripts
+install(PROGRAMS
+  nodes/Robotiq2FGripperRtuNode.py
+  nodes/Robotiq2FGripperSimpleController.py
+  nodes/Robotiq2FGripperStatusListener.py
+  nodes/Robotiq2FGripperTcpNode.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_export_dependencies(ament_cmake)
 ament_export_dependencies(rosidl_default_runtime)
+ament_export_dependencies(builtin_interfaces)
+ament_export_dependencies(std_msgs)
+ament_export_dependencies(ament_cmake_python)
+ament_export_dependencies(rclpy)
 
 ament_package()
 

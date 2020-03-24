@@ -11,6 +11,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <!-- Using cmake file to integrate python code -->
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
   <build_depend>builtin_interfaces</build_depend>
   <build_depend>std_msgs</build_depend>
   <!-- <depend>robotiq_ethercat</depend> -->
@@ -21,8 +23,10 @@
   <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>std_msgs</exec_depend>
 
+  <depend>rclpy</depend>
+
   <member_of_group>rosidl_interface_packages</member_of_group>
-  
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

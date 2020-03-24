@@ -39,3 +39,5 @@ nosetests.xml
 
 CATKIN_IGNORE
 *.user
+
+.vscode
