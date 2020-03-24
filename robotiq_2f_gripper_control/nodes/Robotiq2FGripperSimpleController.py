@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -41,9 +41,9 @@ Command-line interface for sending simple commands to a ROS node controlling a 2
 This serves as an example for publishing messages on the 'Robotiq2FGripperRobotOutput' topic using the 'Robotiq2FGripper_robot_output' msg type for sending commands to a 2F gripper.
 """
 
-import roslib; roslib.load_manifest('robotiq_2f_gripper_control')
-import rospy
-from robotiq_2f_gripper_control.msg import _Robotiq2FGripper_robot_output  as outputMsg
+import rclpy
+from rclpy.node import Node
+from robotiq_2f_gripper_control.msg import Robotiq2FGripperOutput  as outputMsg
 from time import sleep
 
 
@@ -51,52 +51,56 @@ def genCommand(char, command):
     """Update the command according to the character entered by the user."""    
         
     if char == 'a':
-        command = outputMsg.Robotiq2FGripper_robot_output();
-        command.rACT = 1
-        command.rGTO = 1
-        command.rSP  = 255
-        command.rFR  = 150
+        command = outputMsg()
+        command.r_act = 1
+        command.r_gto = 1
+        command.r_sp  = 255
+        command.r_fr  = 150
 
     if char == 'r':
-        command = outputMsg.Robotiq2FGripper_robot_output();
-        command.rACT = 0
+        command = outputMsg()
+        command.r_act = 0
 
     if char == 'c':
-        command.rPR = 255
+        command.r_pr = 255
 
     if char == 'o':
-        command.rPR = 0   
+        command.r_pr = 0   
 
-    #If the command entered is a int, assign this value to rPRA
+    #If the command entered is a int, assign this value to r_prA
     try: 
-        command.rPR = int(char)
-        if command.rPR > 255:
-            command.rPR = 255
-        if command.rPR < 0:
-            command.rPR = 0
+        if int(char) > 255:
+            command.r_pr = 255
+        elif int(char) < 0:
+            command.r_pr = 0
+        else:
+            command.r_pr = int(char)
     except ValueError:
         pass                    
         
     if char == 'f':
-        command.rSP += 25
-        if command.rSP > 255:
-            command.rSP = 255
+        if (command.r_sp + 25) > 255:
+            command.r_sp = 255
+        else:
+            command.r_sp += 25
             
     if char == 'l':
-        command.rSP -= 25
-        if command.rSP < 0:
-            command.rSP = 0
-
+        if (command.r_sp - 25) < 0:
+            command.r_sp = 0
+        else:
+            command.r_sp -= 25
             
     if char == 'i':
-        command.rFR += 25
-        if command.rFR > 255:
-            command.rFR = 255
+        if (command.r_fr + 25) > 255:
+            command.r_fr = 255
+        else:
+            command.r_fr += 25
             
     if char == 'd':
-        command.rFR -= 25
-        if command.rFR < 0:
-            command.rFR = 0
+        if (command.r_fr - 25) < 0:
+            command.r_fr = 0
+        else:
+            command.r_fr -= 25
 
     return command
         
@@ -105,15 +109,14 @@ def askForCommand(command):
     """Ask the user for a command to send to the gripper."""    
 
     currentCommand  = 'Simple 2F Gripper Controller\n-----\nCurrent command:'
-    currentCommand += '  rACT = '  + str(command.rACT)
-    currentCommand += ', rGTO = '  + str(command.rGTO)
-    currentCommand += ', rATR = '  + str(command.rATR)
-    currentCommand += ', rPR = '   + str(command.rPR )
-    currentCommand += ', rSP = '   + str(command.rSP )
-    currentCommand += ', rFR = '   + str(command.rFR )
+    currentCommand += '  r_act = '  + str(command.r_act)
+    currentCommand += ', r_gto = '  + str(command.r_gto)
+    currentCommand += ', r_atr = '  + str(command.r_atr)
+    currentCommand += ', r_pr = '   + str(command.r_pr )
+    currentCommand += ', r_sp = '   + str(command.r_sp )
+    currentCommand += ', r_fr = '   + str(command.r_fr )
 
-
-    print currentCommand
+    print(currentCommand)
 
     strAskForCommand  = '-----\nAvailable commands\n\n'
     strAskForCommand += 'r: Reset\n'
@@ -128,24 +131,31 @@ def askForCommand(command):
     
     strAskForCommand += '-->'
 
-    return raw_input(strAskForCommand)
+    return input(strAskForCommand)
 
-def publisher():
+def publisher(args=None):
     """Main loop which requests new commands and publish them on the Robotiq2FGripperRobotOutput topic."""
-    rospy.init_node('Robotiq2FGripperSimpleController')
+    rclpy.init(args=args)
+
+    node = Node('Robotiq2FGripperSimpleController')
     
-    pub = rospy.Publisher('Robotiq2FGripperRobotOutput', outputMsg.Robotiq2FGripper_robot_output)
+    pub = node.create_publisher(outputMsg, 'Robotiq2FGripperRobotOutput', 1)
 
-    command = outputMsg.Robotiq2FGripper_robot_output();
+    command = outputMsg()
 
-    while not rospy.is_shutdown():
+    try:
+        while rclpy.ok():
 
-        command = genCommand(askForCommand(command), command)            
-        
-        pub.publish(command)
+            command = genCommand(askForCommand(command), command)
 
-        rospy.sleep(0.1)
-                        
+            pub.publish(command)
+
+            sleep(0.1)
+    except KeyboardInterrupt:
+        pass                
+
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     publisher()
